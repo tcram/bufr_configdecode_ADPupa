@@ -20,7 +20,7 @@ C
 C       USERS CAN CHANGE THE DEFAULT INPUT DIRECTORY THROUGH THE CONFIGURATION
 C         FILE BY GIVING THEIR COMPLETE PATHNAME TO WHATEVER.
 C
-        PARAMETER  ( INKSTN=1500 )  ! MAXIMUM NUMBER OF INPUT FILES
+        PARAMETER  ( INKSTN=6000 )  ! MAXIMUM NUMBER OF INPUT FILES
         PARAMETER  ( LENINMX=64 )   ! MAXIMUM LENGTH OF INPUT BASE FILE NAMES
         CHARACTER*64 INFILES(INKSTN)! 64 WOULD PICK UP ".le" EXTENSION AND MORE
         CHARACTER*192 INFILE        ! STRING MUST HOLD DIRIN STRING (<=128) PLUS 
@@ -64,9 +64,15 @@ C           SATWND.2010032300print
 C           AIRCAR.2010032300print
 C
 C ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+C       COMMAND-LINE ARGUMENT DEFINING FULL PATH TO THE INPUT
+C       CONFIGURATION FILE
+
+        CHARACTER*80 argv,CONFILE
+        INTEGER NARG              ! NUMBER OF COMMAND-LINE ARGUMENTS
         PARAMETER  ( ICUNIT=8 )   ! CONFIGURATION INPUT FILE
-        CHARACTER*32 CONFILE
-        DATA CONFILE /'bufrupprair_config              '/
+
+C        CHARACTER*32 CONFILE
+C        DATA CONFILE /'bufrupprair_config              '/
 C
 C ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         PARAMETER  ( IDUNIT=7 )   ! DIAGNOSTIC OUTPUT FILE
@@ -389,6 +395,13 @@ C ##############################################################################
 C #     OPEN AND READ THE CONFIGURATION FILE                                   #
 C ##############################################################################
 C
+        NARG=IARGC()
+        IF (NARG .GT. 0) THEN
+          CALL GETARG(1,argv)
+          CONFILE=argv
+        ELSE
+          CONFILE='bufrupprair_config'  ! Default configuration file
+        ENDIF        
         OPEN (ICUNIT, FILE=CONFILE)
 C
 C        WRITE (*,*) 'opening configuration file'
@@ -887,7 +900,6 @@ C
         IF (KNK.GT.INK)  EXIT DOFILS
 C
         INFILE = DIRIN(1:INHALE)//INFILES(KNK)
-        write (*,*)  infile
 
 C
 C ##############################################################################
@@ -987,12 +999,12 @@ C
 C         READ THE NEXT BUFR MESSAGE ("RECORD") FROM THE FILE
 C
 c         write (*,*)  'A iiunit ',iiunit,', csubset ',csubset,
-c    +      ', recdate',recdate,', istatus ',istatus 
+c     +      ', recdate',recdate,', istatus ',istatus 
 
           CALL READNS(IIUNIT,CSUBSET,RECDATE,ISTATUS)
 
 c         write (*,*)  'B iiunit ',iiunit,', csubset ',csubset,
-c    +      ', recdate',recdate,', istatus ',istatus 
+c     +      ', recdate',recdate,', istatus ',istatus 
 C
           IF  (ISTATUS.NE. 0 )  THEN    ! END OF DATA FILE
             CALL CLOSBF (IIUNIT)
@@ -1181,11 +1193,18 @@ C
             ENDDO
             R8CLAT = R8IDENT(4,Z)
             R8CLON = R8IDENT(5,Z)
+
+            IF (R8CLON .GT. 180.0) THEN
+              write(*,*) 'lat/lon = ',R8CLAT,R8CLON
+            ENDIF
 C
+            write (*,*)  'hello, filter lat/lon window'
             IF (LLDO.EQ.'y')  THEN
               CALL CKLL (RECORDS,RECREPS,R8CLAT,R8CLON,LATS,LATN,
      +                   LONW,LONE,LLWRAP,IDUNIT,DODIAG,ACK)
+              write(*,*) 'ACK: ',ACK
               IF (ACK.EQ.'n')  GO TO 290        ! REJECT UNINTERESTING REPORT
+              write(*,*) 'after ACK'
             ENDIF
             IF (LLRDO.EQ.'y')  THEN
               CALL CKRAD (RECORDS,RECREPS,R8CLAT,R8CLON,RADR,LATR,LONR,
@@ -1589,7 +1608,7 @@ C
 9900      FORMAT (//,' **** ALL ',I5,' BUFR DATA FILES PROCESSED *****',
      +            //,' ************ DONE ************')
                 ENDIF
-        STOP 99999
+C        STOP 99999
         END
 C
 C       ########################################################################

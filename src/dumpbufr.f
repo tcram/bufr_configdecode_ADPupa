@@ -4,7 +4,8 @@
 c     real*8 r8arr(mxmn,mxlv)
       real*8 r8bfms
       parameter (mxbf=32000)
-      character cbfmsg*(mxbf), csubset*8, inf*32
+      character cbfmsg*(mxbf), csubset*8, inf*80
+      integer idate,ierr
       integer   ibfmsg(mxbf/4)
       logical msgok
       PARAMETER ( MXR8PM = 10 )
@@ -19,16 +20,18 @@ c
 c     COMMON  / PREPBC /      hdr, evns, nlev
       r8bfms=10.0E10
 c
-      write(*,*) 'enter input BUFR file?'
+      write(*,*) 'enter input BUFR file:'
       read(*,'(a)') inf
       open(unit=11,file=inf,form='unformatted')
       open(unit=21,file='dumpbufr.out')
+      open(unit=31,file='bufrdx.out')
       call openbf(11,'IN',11)
       call datelen(10)           ! for date: YYYYMMDDHH
       do while (.true.)
         call readns(11,csubset,idate,ierr)
-        write(*,*)' idate: ',idate,'  ',csubset
-        call ufbdmp(11,21)
+        write(*,*)' idate: ',idate,'csubset: ',csubset,'ierr: ',ierr
+        call ufdump(11,21)
+        call dxdump(11,31)
         if(ierr.eq.-1) then
           write(*,*) '....All records read, exit.'
           call closbf(11)
@@ -37,5 +40,6 @@ c
         msgok=.true.
       enddo
  9998 continue
-      stop
+      close(21)
+      close(31)
       end
