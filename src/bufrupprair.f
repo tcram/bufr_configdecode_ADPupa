@@ -1194,17 +1194,10 @@ C
             R8CLAT = R8IDENT(4,Z)
             R8CLON = R8IDENT(5,Z)
 
-            IF (R8CLON .GT. 180.0) THEN
-              write(*,*) 'lat/lon = ',R8CLAT,R8CLON
-            ENDIF
-C
-            write (*,*)  'hello, filter lat/lon window'
             IF (LLDO.EQ.'y')  THEN
               CALL CKLL (RECORDS,RECREPS,R8CLAT,R8CLON,LATS,LATN,
      +                   LONW,LONE,LLWRAP,IDUNIT,DODIAG,ACK)
-              write(*,*) 'ACK: ',ACK
               IF (ACK.EQ.'n')  GO TO 290        ! REJECT UNINTERESTING REPORT
-              write(*,*) 'after ACK'
             ENDIF
             IF (LLRDO.EQ.'y')  THEN
               CALL CKRAD (RECORDS,RECREPS,R8CLAT,R8CLON,RADR,LATR,LONR,
