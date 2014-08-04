@@ -408,7 +408,7 @@ C        WRITE (*,*) 'opening configuration file'
 C
         IFILTER = 'n'
 C
-        DO IC = 1, 10000        ! BEGIN  CONFIGURATION FILE READS
+        DO IC = 1, 14000        ! BEGIN  CONFIGURATION FILE READS
 C 
           IF (DODIAG.EQ.'y')  THEN
             WRITE (*,*)  'read line ',ic,' from the configuration file'
