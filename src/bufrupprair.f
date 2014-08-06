@@ -53,6 +53,7 @@ C         BUILT FROM THE INPUT FILENAMES DURING EXECUTION - THEREBY PRESERVING
 C         A CONVENIENT ONE TO ONE RELATIONSHIP
 C
         CHARACTER*6   NAMETAG, NAMTAGL
+        CHARACTER*4   DASTAG, DASTAGL, TMTAG
         CHARACTER*10  DATETAG
         CHARACTER*192 PRTFILE
 C
@@ -945,10 +946,19 @@ C
         ENDDO
         IF (PARSEOK.EQ.'y')  THEN
           NAMTAGL(01:06) = INFILES(KNK)(06:11)
+          DASTAGL(01:04) = INFILES(KNK)(01:04)
           CALL LOW2UP (NAMTAGL,NAMETAG,6)
+          CALL LOW2UP (DASTAGL,DASTAG,4)
           DATETAG(01:08) = INFILES(KNK)(18:25)
           DATETAG(09:10) = INFILES(KNK)(14:15)
-          PRTFILE = DIROUT(1:EXHALE)//NAMETAG//'.'//DATETAG//'print'
+          IF (INFILES(KNK)(27:28) .EQ. 'tm') THEN
+            TMTAG(01:04) = 'TM'//INFILES(KNK)(29:30)
+            PRTFILE = DIROUT(1:EXHALE)//DASTAG//'.'//NAMETAG//'.'
+     +                //DATETAG//'.'//TMTAG//'print'
+          ELSE
+            PRTFILE = DIROUT(1:EXHALE)//DASTAG//'.'//NAMETAG//'.'
+     +                //DATETAG//'print'
+          ENDIF
         ELSE
           PRTFILE = DIROUT(1:EXHALE)//INFILES(KNK)(01:LENEND)//'_print'
         ENDIF
