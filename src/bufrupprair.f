@@ -954,10 +954,10 @@ C
           IF (INFILES(KNK)(27:28) .EQ. 'tm') THEN
             TMTAG(01:04) = 'TM'//INFILES(KNK)(29:30)
             PRTFILE = DIROUT(1:EXHALE)//DASTAG//'.'//NAMETAG//'.'
-     +                //DATETAG//'.'//TMTAG//'print'
+     +                //DATETAG//'.'//TMTAG//'.txt'
           ELSE
             PRTFILE = DIROUT(1:EXHALE)//DASTAG//'.'//NAMETAG//'.'
-     +                //DATETAG//'print'
+     +                //DATETAG//'.txt'
           ENDIF
         ELSE
           PRTFILE = DIROUT(1:EXHALE)//INFILES(KNK)(01:LENEND)//'_print'
